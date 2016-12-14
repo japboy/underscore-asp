@@ -1,6 +1,12 @@
+<% Option Explicit %>
+<!-- #include file="jsonObject.class.asp" -->
+<!-- #include file="underscore.asp" -->
+
+<% dim U : set U = new Underscore %>
+
 <%
-Option Explicit
 response.addheader "Content-type", "text/markdown; charset=UTF-8"
+
 sub assert(cond1, cond2, mesg)
     dim text
     if (cond1 = cond2) then
@@ -10,12 +16,6 @@ sub assert(cond1, cond2, mesg)
     end if
     response.write text
 end sub
-%>
-<!-- #include file="jsonObject.class.asp" -->
-<!-- #include file="underscore.asp" -->
-
-<%
-dim U : set U = new Underscore
 %>
 
 
@@ -41,18 +41,18 @@ function multiply2(dic, index)
 end function
 
 dim c00_results : c00_results = U.map(c00_collection, "multiply2")
-%>
 
-<% assert 0, c00_results(0), "Expected value of index 0 is 0." %>
-<% assert 2, c00_results(1), "Expected value of index 1 is 2." %>
-<% assert 4, c00_results(2), "Expected value of index 2 is 4." %>
-<% assert 6, c00_results(3), "Expected value of index 3 is 6." %>
-<% assert 8, c00_results(4), "Expected value of index 4 is 8." %>
-<% assert 10, c00_results(5), "Expected value of index 5 is 10." %>
-<% assert 12, c00_results(6), "Expected value of index 6 is 12." %>
-<% assert 14, c00_results(7), "Expected value of index 7 is 14." %>
-<% assert 16, c00_results(8), "Expected value of index 8 is 16." %>
-<% assert 18, c00_results(9), "Expected value of index 9 is 18." %>
+assert 0, c00_results(0), "Expected value of index 0 is 0."
+assert 2, c00_results(1), "Expected value of index 1 is 2."
+assert 4, c00_results(2), "Expected value of index 2 is 4."
+assert 6, c00_results(3), "Expected value of index 3 is 6."
+assert 8, c00_results(4), "Expected value of index 4 is 8."
+assert 10, c00_results(5), "Expected value of index 5 is 10."
+assert 12, c00_results(6), "Expected value of index 6 is 12."
+assert 14, c00_results(7), "Expected value of index 7 is 14."
+assert 16, c00_results(8), "Expected value of index 8 is 16."
+assert 18, c00_results(9), "Expected value of index 9 is 18."
+%>
 
 
 # `.forEach` Sub procedure
@@ -75,18 +75,17 @@ sub multiply3(dic, index)
 end sub
 
 U.forEach c01_collection, "multiply3"
-%>
 
-<% assert 0, c01_results(0), "Expected value of index 0 is 0." %>
-<% assert 3, c01_results(1), "Expected value of index 1 is 3." %>
-<% assert 6, c01_results(2), "Expected value of index 2 is 6." %>
-<% assert 9, c01_results(3), "Expected value of index 3 is 9." %>
-<% assert 12, c01_results(4), "Expected value of index 4 is 12." %>
-<% assert 15, c01_results(5), "Expected value of index 5 is 15." %>
-<% assert 18, c01_results(6), "Expected value of index 6 is 18." %>
-<% assert 21, c01_results(7), "Expected value of index 7 is 21." %>
-<% assert 24, c01_results(8), "Expected value of index 8 is 24." %>
-<% assert 27, c01_results(9), "Expected value of index 9 is 27." %>
+assert 3, c01_results(1), "Expected value of index 1 is 3."
+assert 6, c01_results(2), "Expected value of index 2 is 6."
+assert 9, c01_results(3), "Expected value of index 3 is 9."
+assert 12, c01_results(4), "Expected value of index 4 is 12."
+assert 15, c01_results(5), "Expected value of index 5 is 15."
+assert 18, c01_results(6), "Expected value of index 6 is 18."
+assert 21, c01_results(7), "Expected value of index 7 is 21."
+assert 24, c01_results(8), "Expected value of index 8 is 24."
+assert 27, c01_results(9), "Expected value of index 9 is 27."
+%>
 
 
 # `.filter` Function
@@ -107,13 +106,13 @@ function even(dic, index)
 end function
 
 dim c02_results : c02_results = U.filter(c02_collection, "even")
-%>
 
-<% assert 0, c02_results(0).item("index"), "Expected value of index 0 is 0." %>
-<% assert 2, c02_results(1).item("index"), "Expected value of index 1 is 2." %>
-<% assert 4, c02_results(2).item("index"), "Expected value of index 2 is 4." %>
-<% assert 6, c02_results(3).item("index"), "Expected value of index 3 is 6." %>
-<% assert 8, c02_results(4).item("index"), "Expected value of index 4 is 8." %>
+assert 0, c02_results(0).item("index"), "Expected value of index 0 is 0."
+assert 2, c02_results(1).item("index"), "Expected value of index 1 is 2."
+assert 4, c02_results(2).item("index"), "Expected value of index 2 is 4."
+assert 6, c02_results(3).item("index"), "Expected value of index 3 is 6."
+assert 8, c02_results(4).item("index"), "Expected value of index 4 is 8."
+%>
 
 
 # `.where` Function
@@ -134,11 +133,10 @@ c03_condition.add "index", 2
 c03_condition.add "test", 4
 
 dim c03_results : c03_results = U.where(c03_collection, c03_condition)
+
+assert 2, c03_results(0)("index"), "Expected value of index 0 is 2."
+assert 4, c03_results(0)("test"), "Expected value is 4."
 %>
-
-<% assert 2, c03_results(0)("index"), "Expected value of index 0 is 2." %>
-<% assert 4, c03_results(0)("test"), "Expected value is 4." %>
-
 
 Return 1 of 10 list items filtered by index = 3:
 
@@ -157,7 +155,7 @@ c04_condition.add "index", 2
 c04_condition.add "test", 4
 
 dim c04_results : set c04_results = U.where(c04_jsonarray, c04_condition)
-%>
 
-<% assert 2, c04_results.itemat(0)("index"), "Expected value of index 0 is 2." %>
-<% assert 4, c04_results.itemat(0)("test"), "Expected value is 4." %>
+assert 2, c04_results.itemat(0)("index"), "Expected value of index 0 is 2."
+assert 4, c04_results.itemat(0)("test"), "Expected value is 4."
+%>
