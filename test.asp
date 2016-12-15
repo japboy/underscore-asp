@@ -7,6 +7,9 @@
 <%
 response.addheader "Content-type", "text/markdown; charset=UTF-8"
 
+dim indexIn, jsonarrayIn, jsonobjectIn, arrayIn(), dictionaryIn, valueIn
+dim indexOut, jsonarrayOut, jsonobjectOut, arrayOut, dictionaryOut, valueOut
+
 sub assert(cond1, cond2, mesg)
     dim text
     if (cond1 = cond2) then
@@ -24,138 +27,290 @@ end sub
 <% assert "0.1.2", U.VERSION, "Expected version is 0.1.2." %>
 
 
-# `.map` Function
+# `.forEach` Sub
 
-Return 10 list items multiplying by 2:
+Return 10 items of JSONarray multiplied by 2:
 
 <%
-dim c00_index, c00_collection(10)
-for c00_index = 0 to ubound(c00_collection)
-    dim c00_dictionary : set c00_dictionary = server.createobject("Scripting.Dictionary")
-    c00_dictionary.add "index", c00_index
-    set c00_collection(c00_index) = c00_dictionary
+set jsonarrayIn = new JSONarray
+
+for indexIn = 0 to 9
+    set jsonobjectIn = new JSONobject
+    jsonobjectIn.add "index", indexIn
+    jsonarrayIn.push jsonobjectIn
+    set jsonobjectIn = nothing
 next
 
-function multiply2(dic, index)
-    multiply2 = dic.item("index") * 2
-end function
+set jsonarrayOut = new JSONarray
 
-dim c00_results : c00_results = U.map(c00_collection, "multiply2")
+sub multiply2(jsonobj, index)
+    dim num : num = jsonobj("index") * 2
+    jsonarrayOut.push num
+end sub
 
-assert 0, c00_results(0), "Expected value of index 0 is 0."
-assert 2, c00_results(1), "Expected value of index 1 is 2."
-assert 4, c00_results(2), "Expected value of index 2 is 4."
-assert 6, c00_results(3), "Expected value of index 3 is 6."
-assert 8, c00_results(4), "Expected value of index 4 is 8."
-assert 10, c00_results(5), "Expected value of index 5 is 10."
-assert 12, c00_results(6), "Expected value of index 6 is 12."
-assert 14, c00_results(7), "Expected value of index 7 is 14."
-assert 16, c00_results(8), "Expected value of index 8 is 16."
-assert 18, c00_results(9), "Expected value of index 9 is 18."
+U.forEach jsonarrayIn, "multiply2"
+
+set jsonarrayIn = nothing
+
+assert 10, ubound(jsonarrayOut.items) + 1, "Expected length of JSONarray is 10."
+indexOut = 0
+for each valueOut in jsonarrayOut.items
+    assert indexOut * 2, valueOut, "Expected value of index " & indexOut & " is " & indexOut * 2 & "."
+    indexOut = indexOut + 1
+next
+
+set jsonarrayOut = nothing
+%>
+
+Return 10 items of Array multiplied by 3:
+
+<%
+redim arrayIn(9)
+
+for indexIn = 0 to ubound(arrayIn)
+    set dictionaryIn = server.createobject("Scripting.Dictionary")
+    dictionaryIn.add "index", indexIn
+    set arrayIn(indexIn) = dictionaryIn
+    set dictionaryIn = nothing
+next
+
+redim arrayOut(ubound(arrayIn))
+
+sub multiply3(dict, index)
+    dim num : num = dict.item("index") * 3
+    arrayOut(index) = num
+end sub
+
+U.forEach arrayIn, "multiply3"
+
+assert 10, ubound(arrayOut) + 1, "Expected length of Array is 10."
+for indexOut = 0 to ubound(arrayOut)
+    assert indexOut * 3, arrayOut(indexOut), "Expected value of index " & indexOut & " is " & indexOut * 3 & "."
+next
 %>
 
 
-# `.forEach` Sub procedure
+# `.map` Function
 
-Return 10 list items multiplying by 3:
+Return 10 items of JSONarray divided by 2:
 
 <%
-dim c01_index, c01_collection(10)
-for c01_index = 0 to ubound(c01_collection)
-    dim c01_dictionary : set c01_dictionary = server.createobject("Scripting.Dictionary")
-    c01_dictionary.add "index", c01_index
-    set c01_collection(c01_index) = c01_dictionary
+set jsonarrayIn = new JSONarray
+
+for indexIn = 0 to 9
+    set jsonobjectIn = new JSONobject
+    jsonobjectIn.add "index", indexIn
+    jsonarrayIn.push jsonobjectIn
+    set jsonobjectIn = nothing
 next
 
-dim c01_results : redim c01_results(ubound(c01_collection))
+function divide2(jsonobj, index)
+    divide2 = jsonobj("index") / 2
+end function
 
-sub multiply3(dic, index)
-    dim num : num = dic.item("index") * 3
-    c01_results(index) = num
-end sub
+set jsonarrayOut = U.map(jsonarrayIn, "divide2")
 
-U.forEach c01_collection, "multiply3"
+assert 10, ubound(jsonarrayOut.items) + 1, "Expected length of Array is 10."
+indexOut = 0
+for each valueOut in jsonarrayOut.items
+    assert indexOut / 2, valueOut, "Expected value of index " & indexOut & " is " & indexOut / 2 & "."
+    indexOut = indexOut + 1
+next
+%>
 
-assert 3, c01_results(1), "Expected value of index 1 is 3."
-assert 6, c01_results(2), "Expected value of index 2 is 6."
-assert 9, c01_results(3), "Expected value of index 3 is 9."
-assert 12, c01_results(4), "Expected value of index 4 is 12."
-assert 15, c01_results(5), "Expected value of index 5 is 15."
-assert 18, c01_results(6), "Expected value of index 6 is 18."
-assert 21, c01_results(7), "Expected value of index 7 is 21."
-assert 24, c01_results(8), "Expected value of index 8 is 24."
-assert 27, c01_results(9), "Expected value of index 9 is 27."
+
+Return 10 items of Array divided by 2:
+
+<%
+redim arrayIn(9)
+
+for indexIn = 0 to ubound(arrayIn)
+    set dictionaryIn = server.createobject("Scripting.Dictionary")
+    dictionaryIn.add "index", indexIn
+    set arrayIn(indexIn) = dictionaryIn
+next
+
+function divide3(dict, index)
+    divide3 = dict.item("index") / 3
+end function
+
+arrayOut = U.map(arrayIn, "divide3")
+
+assert 10, ubound(arrayOut) + 1, "Expected length of Array is 10."
+for indexOut = 0 to ubound(arrayOut)
+    assert indexOut / 3, arrayOut(indexOut), "Expected value of index " & indexOut & " is " & indexOut / 3 & "."
+next
+
+erase arrayOut
 %>
 
 
 # `.filter` Function
 
-Return 5 of 10 list items filtered by even numbers:
+Return 5 of 10 items of JSONarray filtered by odd numbers:
 
 <%
-dim c02_index, c02_collection(10)
-for c02_index = 0 to ubound(c02_collection)
-    dim c02_dictionary : set c02_dictionary = server.createobject("Scripting.Dictionary")
-    c02_dictionary.add "index", c02_index
-    set c02_collection(c02_index) = c02_dictionary
+set jsonarrayIn = new JSONarray
+
+for indexIn = 0 to 9
+    set jsonobjectIn = new JSONobject
+    jsonobjectIn.add "index", indexIn
+    jsonarrayIn.push jsonobjectIn
+    set jsonobjectIn = nothing
 next
 
-function even(dic, index)
-    dim result : result = (dic.item("index") Mod 2 = 0)
-    even = result
+function odd(jsonobj, index)
+    odd = (jsonobj("index") mod 2 <> 0)
 end function
 
-dim c02_results : c02_results = U.filter(c02_collection, "even")
+set jsonarrayOut = U.filter(jsonarrayIn, "odd")
 
-assert 0, c02_results(0).item("index"), "Expected value of index 0 is 0."
-assert 2, c02_results(1).item("index"), "Expected value of index 1 is 2."
-assert 4, c02_results(2).item("index"), "Expected value of index 2 is 4."
-assert 6, c02_results(3).item("index"), "Expected value of index 3 is 6."
-assert 8, c02_results(4).item("index"), "Expected value of index 4 is 8."
+assert 5, ubound(jsonarrayOut.items) + 1, "Expected length of JSONarray is 5."
+indexOut = 0
+for each jsonobjectOut in jsonarrayOut.items
+    assert indexOut * 2 + 1, jsonobjectOut("index"), "Expected value of index " & indexOut & " is " & indexOut * 2 + 1 & "."
+    indexOut = indexOut + 1
+next
+%>
+
+
+Return 5 of 10 items of Array filtered by even numbers:
+
+<%
+redim arrayIn(9)
+
+for indexIn = 0 to ubound(arrayIn)
+    set dictionaryIn = server.createobject("Scripting.Dictionary")
+    dictionaryIn.add "index", indexIn
+    set arrayIn(indexIn) = dictionaryIn
+next
+
+function even(dict, index)
+    even = (dict.item("index") mod 2 = 0)
+end function
+
+arrayOut = U.filter(arrayIn, "even")
+
+assert 5, ubound(arrayOut) + 1, "Expected length of Array is 5."
+for indexOut = 0 to ubound(arrayOut)
+    assert indexOut * 2, arrayOut(indexOut).item("index"), "Expected value of index " & indexOut & " is " & indexOut * 2 & "."
+next
+
+erase arrayOut
 %>
 
 
 # `.where` Function
 
-Return 1 of 10 list items filtered by index = 3:
+Return 4 of 10 items of JSONarray filtered by mod 3:
 
 <%
-dim c03_index, c03_collection(10)
-for c03_index = 0 to ubound(c03_collection)
-    dim c03_dictionary : set c03_dictionary = server.createobject("Scripting.Dictionary")
-    c03_dictionary.add "index", c03_index
-    c03_dictionary.add "test", (c03_index * 2)
-    set c03_collection(c03_index) = c03_dictionary
+set jsonarrayIn = new JSONarray
+
+for indexIn = 0 to 9
+    set jsonobjectIn = new JSONobject
+    jsonobjectIn.add "index", indexIn
+    jsonobjectIn.add "value", indexIn mod 3
+    jsonarrayIn.push jsonobjectIn
+    set jsonobjectIn = nothing
 next
 
-dim c03_condition : set c03_condition = server.createobject("Scripting.Dictionary")
-c03_condition.add "index", 2
-c03_condition.add "test", 4
+set dictionaryIn = server.createobject("Scripting.Dictionary")
+dictionaryIn.add "value", 0
 
-dim c03_results : c03_results = U.where(c03_collection, c03_condition)
+set jsonarrayOut = U.where(jsonarrayIn, dictionaryIn)
 
-assert 2, c03_results(0)("index"), "Expected value of index 0 is 2."
-assert 4, c03_results(0)("test"), "Expected value is 4."
+set jsonarrayIn = nothing
+set dictionaryIn = nothing
+
+assert 4, ubound(jsonarrayOut.items) + 1, "Expected length of JSONarray is 4."
+for indexOut = 0 to ubound(jsonarrayOut.items)
+    assert 0, jsonarrayOut.itemat(indexOut)("value"), "Expected value of index " & indexOut & " is 0."
+next
 %>
 
-Return 1 of 10 list items filtered by index = 3:
+
+Return 3 of 10 items of Array filtered by mod 4:
 
 <%
-dim c04_index
-dim c04_jsonarray : set c04_jsonarray = new JSONarray
-for c04_index = 0 to 9
-    dim c04_jsonobject : set c04_jsonobject = new JSONobject
-    c04_jsonobject.add "index", c04_index
-    c04_jsonobject.add "test", (c04_index * 2)
-    c04_jsonarray.push c04_jsonobject
+redim arrayIn(9)
+
+for indexIn = 0 to ubound(arrayIn)
+    set dictionaryIn = server.createobject("Scripting.Dictionary")
+    dictionaryIn.add "index", indexIn
+    dictionaryIn.add "value", indexIn mod 4
+    set arrayIn(indexIn) = dictionaryIn
+    set dictionaryIn = nothing
 next
 
-dim c04_condition : set c04_condition = server.createobject("Scripting.Dictionary")
-c04_condition.add "index", 2
-c04_condition.add "test", 4
+set dictionaryIn = server.createobject("Scripting.Dictionary")
+dictionaryIn.add "value", 0
 
-dim c04_results : set c04_results = U.where(c04_jsonarray, c04_condition)
+arrayOut = U.where(arrayIn, dictionaryIn)
 
-assert 2, c04_results.itemat(0)("index"), "Expected value of index 0 is 2."
-assert 4, c04_results.itemat(0)("test"), "Expected value is 4."
+set dictionaryIn = nothing
+
+assert 3, (ubound(arrayOut) + 1), "Expected length of Array is 3."
+for indexOut = 0 to ubound(arrayOut)
+    assert 0, arrayOut(indexOut)("value"), "Expected value of index " & indexOut & " is 0."
+next
+
+erase arrayOut
+%>
+
+
+# `.findWhere` Function
+
+Return 1 of 10 items of JSONarray filtered by mod 1:
+
+<%
+set jsonarrayIn = new JSONarray
+
+for indexIn = 0 to 9
+    set jsonobjectIn = new JSONobject
+    jsonobjectIn.add "index", indexIn
+    jsonobjectIn.add "value", indexIn mod 1
+    jsonarrayIn.push jsonobjectIn
+    set jsonobjectIn = nothing
+next
+
+set dictionaryIn  = server.createobject("Scripting.Dictionary")
+dictionaryIn.add "value", 0
+
+set jsonobjectOut = U.findWhere(jsonarrayIn, dictionaryIn)
+
+set jsonarrayIn = nothing
+set dictionaryIn = nothing
+
+assert "JSONobject", typename(jsonobjectOut), "Expected return is a JSONobject."
+assert 0, jsonobjectOut("index"), "Expected index is 0."
+assert 0, jsonobjectOut("value"), "Expected value is 0."
+
+set jsonobjectOut = nothing
+%>
+
+Return 1 of 10 items of Array filtered by mod 2:
+
+<%
+redim arrayIn(9)
+
+for indexIn = 0 to ubound(arrayIn)
+    set dictionaryIn = server.createobject("Scripting.Dictionary")
+    dictionaryIn.add "index", indexIn
+    dictionaryIn.add "value", indexIn mod 2
+    set arrayIn(indexIn) = dictionaryIn
+next
+
+set dictionaryIn = server.createobject("Scripting.Dictionary")
+dictionaryIn.add "value", 0
+
+set dictionaryOut = U.findWhere(arrayIn, dictionaryIn)
+
+set dictionaryIn = nothing
+
+assert "Dictionary", typename(dictionaryOut), "Expected return is a Scripting.Dictionary."
+assert 0, dictionaryOut("index"), "Expected index is 0."
+assert 0, dictionaryOut("value"), "Expected value is 0."
+
+set dictionaryOut = nothing
 %>
